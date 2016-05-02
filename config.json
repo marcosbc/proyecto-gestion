@@ -1,0 +1,33 @@
+{
+  "snmp": {
+    "host": "127.0.0.1",
+    "community": "public"
+  },
+  "user1": {
+    "nombre": "Juan",
+    "tarifa": "Delfin",
+    "mac": "e8:9d:87:49:b1:2d"
+  },
+  "user2": {
+    "nombre": "Elisa",
+    "tarifa": "Empresas",
+    "mac": "e8:9d:87:49:b1:5d"
+  },
+  "tarifas": {
+    "Empresas": {
+      "limite": 10,
+      "velocidad": "1"
+    },
+    "Delfin": {
+      "limite": 5,
+      "velocidad": "0"
+    }
+  },
+  "db": {
+    "multipleStatements": true,
+    "host": "localhost",
+    "user": "root",
+    "password": "root",
+    "database": "gestiondb"
+  }
+}
