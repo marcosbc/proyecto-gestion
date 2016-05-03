@@ -22,7 +22,7 @@ function initDatabaseConnection(cfg) {
               'INSERT INTO `usuarios`\n'           +
               '  (nombre, tarifa, mac_address)\n'  +
               'VALUES\n'                           +
-              '   ("' + cfg.user1.nombre + '", "' + cfg.user1.tarifa + '", "' + cfg.user1.mac + '");\n'                       +
+              '   ("' + cfg.user1.nombre + '", "' + cfg.user1.tarifa + '", "' + cfg.user1.mac + '");\n' +
               'INSERT INTO `usuarios`\n'           +
               '  (nombre, tarifa, mac_address)\n'  +
               'VALUES\n'                           +
