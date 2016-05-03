@@ -30,4 +30,4 @@ encuentre el `package.json`):
 
 Para hacerlo funcionar, basta con ejecutar el siguiente comando:
 
-    node server.js
+    node agent.js
