@@ -1,7 +1,10 @@
 {
   "snmp": {
     "host": "127.0.0.1",
-    "community": "public"
+    "community": "public",
+    "options": {
+      "timeout": 1000
+    }
   },
   "user1": {
     "nombre": "Juan",

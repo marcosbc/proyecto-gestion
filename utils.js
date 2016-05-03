@@ -36,7 +36,7 @@ function initDatabaseConnection(cfg) {
   });
   // Buscamos hacer esta llamada sincrona
   while(!done && counter < timeout) {
-    deasync.sleep(10);
+    deasync.sleep(20);
     counter++;
   }
   return connection
@@ -49,7 +49,7 @@ function populateUsersArray(connection) {
       i,
       users = [];
   var done = false,
-      timeout = 50,
+      timeout = 100,
       counter = 0;
   var query = 'SELECT nombre, tarifa, mac_address FROM `usuarios`;';
   connection.query(query, function(err, rows, fields) {
@@ -67,38 +67,63 @@ function populateUsersArray(connection) {
   });
   // Buscamos hacer esta llamada sincrona
   while(!done && counter < timeout) {
-    deasync.sleep(10);
+    deasync.sleep(20);
     counter++;
   }
   return users;
 }
 function initSnmpSession(cfg) {
-  return snmp.createSession(cfg.snmp.host, cfg.snmp.community);
+  return snmp.createSession(cfg.snmp.host, cfg.snmp.community, cfg.snmp.options);
 }
-function snmpGet(session, oid) {
-  var response = {
-    error: false,
-    msg: '',
-    oid: '',
-    value: ''
+function snmpGet(session, oids) {
+  var responseObj = {
+    error: true,
+    msg: 'SNMP error',
+    responses: []
+  };
+  var done = false,
+      timeout = 100,
+      counter = 0,
+      i = 0;
+  session.get(oids, function(error, varbinds) {
+    if (error) {
+      responseObj.msg = error.message;
+    } else {
+      responseObj.error = false;
+      for (var i = 0; i < varbinds.length; i++) {
+        responseObj.responses[i] = {
+          oid: varbinds[i].oid,
+          value: `${varbinds[i].value}`
+        }
+      }
+    }
+    done = true;
+  });
+  // Buscamos hacer esta llamada sincrona
+  while(!done && counter < timeout) {
+    deasync.sleep(20);
+    counter++;
+  }
+  return responseObj;
+}
+function snmpSet(session, requestVarbinds) {
+  var responseObj = {
+    error: true,
+    msg: 'SNMP error',
+    responses: []
   }
   var done = false,
-      timeout = 50,
+      timeout = 100,
       counter = 0;
-  session.get([oid], function(error, varbinds) {
+  session.set(requestVarbinds, function(error, varbinds) {
     if (error) {
-      response.error = true;
-      response.msg = error.message;
+      responseObj.msg = error.message;
     } else {
+      responseObj.error = false;
       for (var i = 0; i < varbinds.length; i++) {
-        if(snmp.isVarbindError(varbinds[i])) {
-          // Para SNMP v2c es necesario comprobar si hubo error en el OID
-          response.error = true;
-          response.msg = snmp.varbindError(varbinds[i]);
-        } else {
-          response.oid = varbinds[i].oid;
-          response.value = `${varbinds[i].value}`;
-          response.msg = `${response.oid} = ${response.value}`;
+        responseObj.responses[i] = {
+          oid: varbinds[i].oid,
+          value: `${varbinds[i].value}`
         }
       }
     }
@@ -109,43 +134,40 @@ function snmpGet(session, oid) {
     deasync.sleep(10);
     counter++;
   }
-  return response;
+  return responseObj;
 }
-function snmpSet(session, varbind) {
-  var response = {
-    error: false,
-    msg: '',
-    oid: '',
-    value: ''
+function isValidResponse(response) {
+  if(response.error != false) {
+    console.error(response.msg);
+    return false;
   }
-  var done = false,
-      timeout = 50,
-      counter = 0;
-  session.set([varbind], function(error, varbinds) {
-    if (error) {
-      response.error = true;
-      response.msg = error.message;
-    } else {
-      for (var i = 0; i < varbinds.length; i++) {
-        if(snmp.isVarbindError(varbinds[i])) {
-          // Para SNMP v2c es necesario comprobar si hubo error en el OID
-          response.error = true;
-          response.msg = snmp.varbindError(varbinds[i]);
-        } else {
-          response.oid = varbinds[i].oid;
-          response.value = `${varbinds[i].value}`;
-          response.msg = `${response.oid} = ${response.value}`;
-        }
+  return true;
+}
+function updateIfStatusArray(session) {
+  const ifNumber = "1.3.6.1.2.1.2.1",
+        ifOperStatus = "1.3.6.1.2.1.2.2.1.8";
+  var numIfsResponse,
+      ifStatusResponse,
+      numIfs,
+      ifStatusArr = [],
+      ifIterator = 0,
+      requestOids = [];
+  numIfsResponse = snmpGet(session, [`${ifNumber}.0`]);
+  if(isValidResponse(numIfsResponse)) {
+    // Obtener informacion de estado de todos los puertos
+    numIfs = numIfsResponse.responses[0].value;
+    for(ifIterator = 1; ifIterator <= numIfs; ifIterator++) {
+      requestOids.push(`${ifOperStatus}.${ifIterator}`);
+    }
+    ifStatusResponse = snmpGet(session, requestOids);
+    if(isValidResponse(ifStatusResponse)) {
+      // Popular tabla de estados de puertos
+      for(ifIterator = 0; ifIterator < numIfs; ifIterator++) {
+        ifStatusArr[ifIterator] = ifStatusResponse.responses[ifIterator].value;
       }
     }
-    done = true;
-  });
-  // Buscamos hacer esta llamada sincrona
-  while(!done && counter < timeout) {
-    deasync.sleep(10);
-    counter++;
   }
-  return response;
+  return ifStatusArr;
 }
 module.exports = {
   initDatabaseConnection: initDatabaseConnection,
@@ -154,4 +176,6 @@ module.exports = {
   populateUsersArray: populateUsersArray,
   snmpGet: snmpGet,
   snmpSet: snmpSet,
+  isValidResponse: isValidResponse,
+  updateIfStatusArray: updateIfStatusArray
 }
