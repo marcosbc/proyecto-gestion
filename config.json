@@ -9,12 +9,12 @@
   "user1": {
     "nombre": "Juan",
     "tarifa": "Delfin",
-    "mac": "e8:9d:87:49:b1:2d"
+    "mac": "e89d8749b12d"
   },
   "user2": {
     "nombre": "Elisa",
     "tarifa": "Empresas",
-    "mac": "e8:9d:87:49:b1:5d"
+    "mac": "e89d8749b15d"
   },
   "tarifas": {
     "Empresas": {

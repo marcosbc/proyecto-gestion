@@ -93,7 +93,7 @@ function snmpGet(session, oids) {
       for (var i = 0; i < varbinds.length; i++) {
         responseObj.responses[i] = {
           oid: varbinds[i].oid,
-          value: `${varbinds[i].value}`
+          value: varbinds[i].value
         }
       }
     }
@@ -123,7 +123,7 @@ function snmpSet(session, requestVarbinds) {
       for (var i = 0; i < varbinds.length; i++) {
         responseObj.responses[i] = {
           oid: varbinds[i].oid,
-          value: `${varbinds[i].value}`
+          value: varbinds[i].value
         }
       }
     }
@@ -143,31 +143,41 @@ function isValidResponse(response) {
   }
   return true;
 }
-function updateIfStatusArray(session) {
+function updateIfArray(session) {
   const ifNumber = "1.3.6.1.2.1.2.1",
-        ifOperStatus = "1.3.6.1.2.1.2.2.1.8";
+        ifOperStatus = "1.3.6.1.2.1.2.2.1.8",
+        ifPhysAddress = "1.3.6.1.2.1.2.2.1.6";
   var numIfsResponse,
       ifStatusResponse,
+      macResponse,
       numIfs,
-      ifStatusArr = [],
+      ifArr = [],
       ifIterator = 0,
-      requestOids = [];
+      ifStatusRequestOids = [],
+      macRequestOids = [];
   numIfsResponse = snmpGet(session, [`${ifNumber}.0`]);
   if(isValidResponse(numIfsResponse)) {
     // Obtener informacion de estado de todos los puertos
     numIfs = numIfsResponse.responses[0].value;
     for(ifIterator = 1; ifIterator <= numIfs; ifIterator++) {
-      requestOids.push(`${ifOperStatus}.${ifIterator}`);
+      ifStatusRequestOids.push(`${ifOperStatus}.${ifIterator}`);
+      macRequestOids.push(`${ifPhysAddress}.${ifIterator}`);
     }
-    ifStatusResponse = snmpGet(session, requestOids);
-    if(isValidResponse(ifStatusResponse)) {
+    ifStatusResponse = snmpGet(session, ifStatusRequestOids);
+    macResponse = snmpGet(session, macRequestOids);
+    if(isValidResponse(ifStatusResponse) && isValidResponse(macResponse)) {
       // Popular tabla de estados de puertos
       for(ifIterator = 0; ifIterator < numIfs; ifIterator++) {
-        ifStatusArr[ifIterator] = ifStatusResponse.responses[ifIterator].value;
+        ifArr[ifIterator] = {
+          status: ifStatusResponse.responses[ifIterator].value,
+          mac: macResponse.responses[ifIterator].value.toString('hex')
+        }
       }
+    } else {
+      console.log('err');
     }
   }
-  return ifStatusArr;
+  return ifArr;
 }
 module.exports = {
   initDatabaseConnection: initDatabaseConnection,
@@ -177,5 +187,5 @@ module.exports = {
   snmpGet: snmpGet,
   snmpSet: snmpSet,
   isValidResponse: isValidResponse,
-  updateIfStatusArray: updateIfStatusArray
+  updateIfArray: updateIfArray
 }

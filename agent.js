@@ -7,17 +7,17 @@ var config = require('./config'),
     db,
     session;
 /* Variables del programa */
-var ifStatusArr;
+var ifArray;
 /* Programa principal */
 // Inicializamos variables
 db = utils.initDatabaseConnection(config);
 users = utils.populateUsersArray(db);
 session = utils.initSnmpSession(config);
 // Contenido del programa principal
-ifStatusArr = utils.updateIfStatusArray(session);
-if(ifStatusArr.length > 0) {
+ifArray = utils.updateIfArray(session);
+if(ifArray.length > 0) {
   // No hubo error
-  console.log(ifStatusArr);
+  console.log(ifArray);
 }
 // Terminamos cerrando la conexion con la base de datos
 utils.endDatabaseConnection(db);
