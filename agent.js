@@ -26,7 +26,7 @@ users = config.customers;
 // Se aprovecha para obtener los octetos y cortar el tráfico si procede
 while(true) {
   ifArray = utils.updateIfArray(session);
-  if(ifArray.length > 0) {
+  if(Object.keys(ifArray).length > 0) {
     // Obtenemos los usuarios conectados y los intentamos identificar
     connectedUsers = utils.getConnectedUsersAndUsage(ifArray, customers, config.defaultDataPlan, session);
     for(userIterator = 0; userIterator < connectedUsers.length; userIterator++) {

@@ -82,27 +82,24 @@ function updateIfArray(session) {
       ifStatusResponse,
       macResponse,
       numIfs,
-      ifArr = [],
-      ifIterator = 0,
-      ifStatusRequestOids = [],
-      macRequestOids = [];
+      ifCounter;
+      ifArr = {},
+      ifIterator = 0;
   numIfsResponse = snmpGet(session, [`${ifNumber}.0`]);
   if(isValidResponse(numIfsResponse)) {
     // Obtener informacion de estado de todos los puertos
     numIfs = numIfsResponse.responses[0].value;
-    for(ifIterator = 1; ifIterator <= numIfs; ifIterator++) {
-      ifStatusRequestOids.push(`${ifOperStatus}.${ifIterator}`);
-      macRequestOids.push(`${ifPhysAddress}.${ifIterator}`);
-    }
-    ifStatusResponse = snmpGet(session, ifStatusRequestOids);
-    macResponse = snmpGet(session, macRequestOids);
-    if(isValidResponse(ifStatusResponse) && isValidResponse(macResponse)) {
-      // Popular tabla de estados de puertos
-      for(ifIterator = 0; ifIterator < numIfs; ifIterator++) {
+    for(ifIterator = 1, ifCounter = 1; ifCounter <= numIfs; ifIterator++) {
+      // No se puede hacer conjunto porque hay casos donde no existe un
+      // puerto (p.ej. puertos 8, 10, 11... -> no existe el 9)
+      ifStatusResponse = snmpGet(session, [`${ifOperStatus}.${ifIterator}`]);
+      macResponse = snmpGet(session, [`${ifPhysAddress}.${ifIterator}`]);
+      if(isValidResponse(ifStatusResponse) && isValidResponse(macResponse)) {
+        ifCounter++;
         ifArr[ifIterator] = {
-          status: ifStatusResponse.responses[ifIterator].value,
-          mac: macResponse.responses[ifIterator].value.toString('hex')
-        }
+          status: ifStatusResponse.responses[0].value,
+          mac: macResponse.responses[0].value.toString('hex')
+        };
       }
     }
   }
@@ -132,7 +129,7 @@ function getConnectedUsersAndUsage(ifArray, customerList, defaultPlan, session) 
       etherStatsOctetsRequestOids = [],
       etherStatsOctetsResponse;
   // Obtener informacion del usuario conectado al puerto
-  for(ifIterator = 0; ifIterator < ifArray.length; ifIterator++) {
+  for(ifIterator in ifArray) {
     ifEntry = ifArray[ifIterator];
     if(ifEntry.status === ifUp && ifEntry.mac !== '') {
       userPlan = defaultPlan;
@@ -153,8 +150,11 @@ function getConnectedUsersAndUsage(ifArray, customerList, defaultPlan, session) 
   if(etherStatsOctetsRequestOids.length > 0) {
     etherStatsOctetsResponse = snmpGet(session, etherStatsOctetsRequestOids);
     if(isValidResponse(etherStatsOctetsResponse)) {
+      userUsage = etherStatsOctetsResponse.responses[userIterator].value;
+      /*
+      // For debugging
       userUsage = ((new Date()).getTime());
-      //userUsage = etherStatsOctetsResponse.responses[userIterator].value;
+      */
       for(userIterator = 0; userIterator < numConnectedUsers; userIterator++) {
         connectedUsers[userIterator].usage = userUsage;
       }
