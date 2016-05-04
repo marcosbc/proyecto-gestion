@@ -1,4 +1,5 @@
 {
+  "refreshPeriod": 5000,
   "snmp": {
     "host": "127.0.0.1",
     "community": "public",
@@ -6,24 +7,34 @@
       "timeout": 1000
     }
   },
-  "user1": {
-    "nombre": "Juan",
-    "tarifa": "Delfin",
-    "mac": "e89d8749b12d"
-  },
-  "user2": {
-    "nombre": "Elisa",
-    "tarifa": "Empresas",
-    "mac": "e89d8749b15d"
-  },
-  "tarifas": {
+  "customers": [
+    {
+      "name": "Juan",
+      "dataPlan": "Delfin",
+      "mac": "e89d8749b12d"
+    },
+    {
+      "name": "Elisa",
+      "dataPlan": "Empresas",
+      "mac": "e89d8749b15d"
+    }
+  ],
+  "defaultDataPlan": "Invitados",
+  "dataPlan": {
     "Empresas": {
-      "limite": 10,
-      "velocidad": "1"
+      "limit": 10,
+      "speed": "1",
+      "limitationDuration": 60
     },
     "Delfin": {
-      "limite": 5,
-      "velocidad": "0"
+      "limit": 5,
+      "speed": "0",
+      "limitationDuration": 60
+    },
+    "Invitados": {
+      "limit": 1,
+      "speed": "0",
+      "limitationDuration": 60
     }
   },
   "db": {

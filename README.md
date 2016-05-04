@@ -14,8 +14,6 @@ Para empezar, es necesario cumplir con unos requisitos iniciales:
 
 - Es necesario instalar [NodeJS](https://nodejs.org/en/) en tu equipo y
   que se pueda usar mediante línea de comandos.
-- Se debe tener un servidor MySQL accesible. Se puede configurar los
-  parámetros de uso en el fichero de configuración, `config.json`.
 - Se debe configurar un servidor SNMP y configurarlo apropiadamente en
   el fichero de configuración, `config.json`. Es necesario haber creado
   la base de datos antes de ejecutar el programa.

@@ -1,77 +1,8 @@
 /*
  * Dependencias
  */
-var mysql = require('mysql'),
-    snmp = require('net-snmp'),
-    deasync = require('deasync')
-/*
- * Inicializa la base de datos e inserta datos de ejemplo,
- * segun lo especificado en config.json.
- */
-function initDatabaseConnection(cfg) {
-  var connection = mysql.createConnection(cfg.db);
-  var done = false,
-      timeout = 50,
-      counter = 0;
-  var query = 'DROP TABLE IF EXISTS `usuarios`;\n' +
-              'CREATE TABLE `usuarios` (\n'        +
-              '  nombre CHAR(20) NOT NULL,\n'      +
-              '  tarifa CHAR(20),\n'               +
-              '  mac_address CHAR(17)\n'           +
-              ');\n'                               +
-              'INSERT INTO `usuarios`\n'           +
-              '  (nombre, tarifa, mac_address)\n'  +
-              'VALUES\n'                           +
-              '   ("' + cfg.user1.nombre + '", "' + cfg.user1.tarifa + '", "' + cfg.user1.mac + '");\n' +
-              'INSERT INTO `usuarios`\n'           +
-              '  (nombre, tarifa, mac_address)\n'  +
-              'VALUES\n'                           +
-              '   ("' + cfg.user2.nombre + '", "' + cfg.user2.tarifa + '", "' + cfg.user2.mac + '");'
-  connection.connect();
-  connection.query(query, function(err) {
-    if (err) {
-      throw err;
-    }
-    done = true;
-  });
-  // Buscamos hacer esta llamada sincrona
-  while(!done && counter < timeout) {
-    deasync.sleep(20);
-    counter++;
-  }
-  return connection
-}
-function endDatabaseConnection(connection) {
-  connection.end();
-}
-function populateUsersArray(connection) {
-  var query = '',
-      i,
-      users = [];
-  var done = false,
-      timeout = 100,
-      counter = 0;
-  var query = 'SELECT nombre, tarifa, mac_address FROM `usuarios`;';
-  connection.query(query, function(err, rows, fields) {
-    if (err) {
-      throw err;
-    }
-    for(i = 0; i < rows.length; i++) {
-      users.push({
-        nombre: rows[i].nombre,
-        tarifa: rows[i].tarifa,
-        mac: rows[i].mac_address
-      });
-    }
-    done = true;
-  });
-  // Buscamos hacer esta llamada sincrona
-  while(!done && counter < timeout) {
-    deasync.sleep(20);
-    counter++;
-  }
-  return users;
-}
+var snmp = require('net-snmp'),
+    deasync = require('deasync');
 function initSnmpSession(cfg) {
   return snmp.createSession(cfg.snmp.host, cfg.snmp.community, cfg.snmp.options);
 }
@@ -173,19 +104,95 @@ function updateIfArray(session) {
           mac: macResponse.responses[ifIterator].value.toString('hex')
         }
       }
-    } else {
-      console.log('err');
     }
   }
   return ifArr;
 }
+function findCustomer(mac, customerList) {
+  var customer;
+  for(customer in customerList) {
+    if(mac === customer.mac) {
+      return customer;
+    }
+  }
+}
+function getConnectedUsersAndUsage(ifArray, customerList, defaultPlan, session) {
+  const ifUp = 1,
+        ifDown = 2,
+        ifTesting = 3,
+        etherStatsOctets = "1.3.6.1.2.1.16.1.1.1.4";
+  var connectedUsers = [],
+      ifEntry,
+      ifIterator,
+      userIterator,
+      userPlan,
+      customer,
+      userUsage,
+      numConnectedUsers = 0,
+      etherStatsOctetsRequestOids = [],
+      etherStatsOctetsResponse;
+  // Obtener informacion del usuario conectado al puerto
+  for(ifIterator = 0; ifIterator < ifArray.length; ifIterator++) {
+    ifEntry = ifArray[ifIterator];
+    if(ifEntry.status === ifUp && ifEntry.mac !== '') {
+      userPlan = defaultPlan;
+      if(customer = findCustomer(ifEntry.mac, customerList)) {
+        userPlan = customer.dataPlan;
+      }
+      connectedUsers.push({
+        ifPort: ifIterator,
+        mac: ifEntry.mac,
+        plan: userPlan,
+        usage: 0
+      });
+      numConnectedUsers++;
+      etherStatsOctetsRequestOids.push(`${etherStatsOctets}.${ifIterator}`);
+    }
+  }
+  // Obtener el uso de datos (en octetos) de cada usuario
+  if(etherStatsOctetsRequestOids.length > 0) {
+    etherStatsOctetsResponse = snmpGet(session, etherStatsOctetsRequestOids);
+    if(isValidResponse(etherStatsOctetsResponse)) {
+      userUsage = ((new Date()).getTime());
+      //userUsage = etherStatsOctetsResponse.responses[userIterator].value;
+      for(userIterator = 0; userIterator < numConnectedUsers; userIterator++) {
+        connectedUsers[userIterator].usage = userUsage;
+      }
+    }
+  }
+  return connectedUsers;
+}
+function getTime() {
+  var d = new Date();
+  return Math.floor(d.getTime() / 1000);
+}
+function openIfTraffic(ifPort, session) {
+  const ifAdminStatus = "1.3.6.1.2.1.2.2.1.7",
+        ifUp = 1;
+  var ifOpenTrafficRequest = snmpSet(session, {
+    oid: `${ifAdminStatus}.${ifPort}`,
+    type: snmp.ObjectType.Integer,
+    value: ifUp
+  });
+}
+function closeIfTraffic(ifPort, session) {
+  const ifAdminStatus = "1.3.6.1.2.1.2.2.1.7",
+        ifDown = 2;
+  var ifCloseTrafficRequest = snmpSet(session, {
+    oid: `${ifAdminStatus}.${ifPort}`,
+    type: snmp.ObjectType.Integer,
+    value: ifDown
+  });
+}
 module.exports = {
-  initDatabaseConnection: initDatabaseConnection,
-  endDatabaseConnection: endDatabaseConnection,
   initSnmpSession: initSnmpSession,
-  populateUsersArray: populateUsersArray,
   snmpGet: snmpGet,
   snmpSet: snmpSet,
   isValidResponse: isValidResponse,
-  updateIfArray: updateIfArray
+  updateIfArray: updateIfArray,
+  findCustomer: findCustomer,
+  getConnectedUsersAndUsage: getConnectedUsersAndUsage,
+  getTime: getTime,
+  openIfTraffic: openIfTraffic,
+  closeIfTraffic: closeIfTraffic
 }
