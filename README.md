@@ -1,4 +1,4 @@
-# Gestión de velocidad de usuarios de una red mediante SNMP
+# Gestión de puertos de una red con usuarios mediante un agente SNMP
 
 ## Componentes del equipo
 

@@ -1,7 +1,7 @@
 {
-  "name": "servidor-gestion-trafico",
-  "version": "0.0.1",
-  "description": "Servidor que gestiona el trafico de usuarios y reduce o corta la velocidad al superar cierto umbral de octetos.",
+  "name": "agente-gestion-trafico-snmp",
+  "version": "1.0",
+  "description": "Agente que gestiona el trafico de usuarios y reduce o corta la velocidad al superar cierto umbral de octetos.",
   "main": "agent.js",
   "dependencies": {
     "deasync": "^0.1.6",
