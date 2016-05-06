@@ -14,6 +14,11 @@
       "mac": "6805ca2a01cf"
     },
     {
+      "name": "Beatriz auxiliar",
+      "dataPlan": "Delfin",
+      "mac": "6805ca29fd10"
+    },
+    {
       "name": "Marcos",
       "dataPlan": "Empresas",
       "mac": "ac87a329ea2d"
@@ -22,24 +27,29 @@
       "name": "Omar",
       "dataPlan": "Invitados",
       "mac": "6805ca29fb36"
+    },
+    {
+      "name": "Omar auxiliar",
+      "dataPlan": "Invitados",
+      "mac": "6805ca2a0316"
     }
   ],
   "defaultDataPlan": "Invitados",
   "dataPlan": {
     "Empresas": {
-      "limit": 1000000,
+      "limit": 5000000,
       "speed": "1",
-      "limitationDuration": 20
+      "limitationDuration": 30
     },
     "Delfin": {
-      "limit": 100000,
+      "limit": 500000,
       "speed": "0",
-      "limitationDuration": 40
+      "limitationDuration": 50
     },
     "Invitados": {
-      "limit": 500,
+      "limit": 50000,
       "speed": "0",
-      "limitationDuration": 100
+      "limitationDuration": 80
     }
   },
   "db": {

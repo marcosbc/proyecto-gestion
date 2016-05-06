@@ -266,6 +266,10 @@ function openIfTraffic(ifPort, session) {
     type: snmp.ObjectType.Integer,
     value: ifUp
   }]);
+  /*
+  // Para debugging
+  console.log(`*** Re-abierto puerto ${ifPort} ***`);
+  */
 }
 function closeIfTraffic(ifPort, session) {
   const ifAdminStatus = "1.3.6.1.2.1.2.2.1.7",
@@ -275,6 +279,10 @@ function closeIfTraffic(ifPort, session) {
     type: snmp.ObjectType.Integer,
     value: ifDown
   }]);
+  /*
+  // Para debugging
+  console.log(`*** Cortado puerto ${ifPort} ***`);
+  */
 }
 function collect() {
   var ret = {};
