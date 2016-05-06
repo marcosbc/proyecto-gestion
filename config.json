@@ -14,14 +14,14 @@
       "mac": "6805ca2a01cf"
     },
     {
-      "name": "Beatriz auxiliar",
-      "dataPlan": "Delfin",
-      "mac": "6805ca29fd10"
-    },
-    {
       "name": "Marcos",
       "dataPlan": "Empresas",
       "mac": "ac87a329ea2d"
+    },
+    {
+      "name": "Marcos auxiliar",
+      "dataPlan": "Empresas",
+      "mac": "6805ca2a0316"
     },
     {
       "name": "Omar",
@@ -31,7 +31,7 @@
     {
       "name": "Omar auxiliar",
       "dataPlan": "Invitados",
-      "mac": "6805ca2a0316"
+      "mac": "6805ca29fd10"
     }
   ],
   "defaultDataPlan": "Invitados",
