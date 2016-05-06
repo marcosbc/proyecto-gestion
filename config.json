@@ -37,26 +37,16 @@
   "defaultDataPlan": "Invitados",
   "dataPlan": {
     "Empresas": {
-      "limit": 5000000,
-      "speed": "1",
-      "limitationDuration": 30
+      "limit": 10000000,
+      "limitationDuration": 20
     },
     "Delfin": {
-      "limit": 500000,
-      "speed": "0",
-      "limitationDuration": 50
+      "limit": 1000000,
+      "limitationDuration": 40
     },
     "Invitados": {
-      "limit": 50000,
-      "speed": "0",
-      "limitationDuration": 80
+      "limit": 250000,
+      "limitationDuration": 60
     }
-  },
-  "db": {
-    "multipleStatements": true,
-    "host": "localhost",
-    "user": "root",
-    "password": "root",
-    "database": "gestiondb"
   }
 }
