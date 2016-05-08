@@ -8,7 +8,6 @@ var config = require('./config'),
     connectedUsers,
     disconnectedUsers = {},
     session;
-/* Variables del programa */
 const ifUp = 1,
       ifDown = 2;
 var ifArray,
@@ -25,17 +24,21 @@ session = utils.initSnmpSession(config);
 // Idealmente habria que usar una base de datos
 users = config.customers;
 // Contenido del programa principal
-// Vamos a realizar un barrido de las interfaces cada 10 segundos
-// Se aprovecha para obtener los octetos y cortar el tráfico si procede
+// Vamos a realizar un barrido de las interfaces cada 5 segundos
+// Se aprovecha para obtener los octetos y cortar el trafico si procede
 while(true) {
-  ifArray = utils.updateIfArray(session);
+  // Primero queremos obtener las interfaces y sus estados y MACs asociadas
+  ifArray = utils.updateIfArray(session, config.ifLimit);
   if(Object.keys(ifArray).length > 0) {
     // Obtenemos los usuarios conectados y los intentamos identificar
     connectedUsers = utils.collect(utils.getConnectedUsersAndUsage(ifArray, config.customers, config.defaultDataPlan, session), disconnectedUsers);
+    // Por cada usuario comprobaremos si cumple con su tarifa
     for(userIterator in connectedUsers) {
       cleanUser = false;
+      // Variables para acortar lineas, no util para modificar
       connectedUser = connectedUsers[userIterator];
       userDataPlan = config.dataPlan[connectedUser.plan];
+      // Iremos populando el array de contador por iteracion
       userUsageEntry = userUsageTimerArray[connectedUser.mac];
       if(typeof userUsageEntry === 'undefined') {
         // No tiene una entrada especifica aun, la creamos
@@ -63,9 +66,8 @@ while(true) {
         userUsageTimerArray[connectedUser.mac] = {
           initialUsage: connectedUser.usage,
           status: ifUp,
-          // Calculamos la caducidad del limite
           limitationEnd: 0
-        }
+        };
       }
     }
     /*
@@ -80,5 +82,6 @@ while(true) {
   } else {
     console.error("Error al obtener datos");
   }
+  // Esperar el intervalo establecido en la configuracion
   deasync.sleep(config.refreshPeriod);
 }

@@ -1,4 +1,5 @@
 {
+  "ifLimit": 28,
   "refreshPeriod": 5000,
   "snmp": {
     "host": "10.10.10.1",

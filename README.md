@@ -1,5 +1,13 @@
 # Gestión de puertos de una red con usuarios mediante un agente SNMP
 
+## Componentes del equipo
+
+- Omar Feljy
+- Beatriz Carretero Parra
+- Marcos Bjorkelund
+
+## Introducción
+
 El proyecto consiste en la programación de un agente que sea capaz de
 cortar el tráfico cuando se supere cierto umbral de octetos en el
 tráfico de un puerto del conmutador usago en los laboratorios (HP 2510 o
@@ -28,12 +36,6 @@ guardando el estado inicial y, a partir de traps SNMP, obtener los
 cambios en la topología (p. ej. se disconecta un equipo del conmutador
 manualmente).
 
-## Componentes del equipo
-
-- Omar Feljy
-- Beatriz Carretero Parra
-- Marcos Bjorkelund
-
 ## Instrucciones de uso
 
 ### Requisitos iniciales
@@ -41,7 +43,7 @@ manualmente).
 Para empezar, es necesario cumplir con unos requisitos iniciales:
 
 - Es necesario instalar [NodeJS](https://nodejs.org/en/) en tu equipo y
-  que se pueda usar mediante línea de comandos.
+  que se pueda usar mediante línea de comandos (junto con NPM).
 - Se debe configurar un servidor SNMP y configurarlo apropiadamente en
   el fichero de configuración, `config.json`. Es necesario haber creado
   la base de datos antes de ejecutar el programa.

@@ -1,7 +1,13 @@
 {
   "name": "agente-gestion-trafico-snmp",
-  "version": "1.1",
-  "description": "Agente que gestiona el trafico de usuarios y reduce o corta la velocidad al superar cierto umbral de octetos.",
+  "version": "1.2.2",
+  "description": "Agente que monitoriza el trafico de puertos de un conmutador y lo corta al superar cierto umbral de octetos, dependiendo de la configuracion de los usuarios conectados a este.",
+  "license": "MIT",
+  "readme": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/marcosbc/proyecto-gestion.git"
+  },
   "main": "agent.js",
   "dependencies": {
     "deasync": "^0.1.6",
