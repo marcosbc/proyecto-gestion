@@ -1,4 +1,4 @@
-# Gestión de puertos de una red con usuarios mediante un agente SNMP
+# Gestión de puertos de una red con usuarios mediante un gestor SNMP
 
 ## Componentes del equipo
 
@@ -8,7 +8,7 @@
 
 ## Introducción
 
-El proyecto consiste en la programación de un agente que sea capaz de
+El proyecto consiste en la programación de un gestor que sea capaz de
 cortar el tráfico cuando se supere cierto umbral de octetos en el
 tráfico de un puerto del conmutador usago en los laboratorios (HP 2510 o
 2610).
@@ -58,11 +58,11 @@ encuentre el `package.json`):
 
 Para hacerlo funcionar, basta con ejecutar el siguiente comando:
 
-    node agent.js
+    node manager.js
 
 ### Instrucciones para la demo
 
-Para la demo es necesario iniciar un agente TFTP, cuyo servidor tenga
+Para la demo es necesario iniciar un servidor TFTP, que tenga
 asociado la tarifa "Empresas" o "Delfin", mientras el cliente tenga
 asignada la tarifa "Invitados".
 

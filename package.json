@@ -1,14 +1,14 @@
 {
-  "name": "agente-gestion-trafico-snmp",
-  "version": "1.2.2",
-  "description": "Agente que monitoriza el trafico de puertos de un conmutador y lo corta al superar cierto umbral de octetos, dependiendo de la configuracion de los usuarios conectados a este.",
+  "name": "gestor-trafico-snmp",
+  "version": "1.2.3",
+  "description": "Gestor SNMP que monitoriza el trafico de puertos de un conmutador y lo corta al superar cierto umbral de octetos, dependiendo de la configuracion de los usuarios conectados a este.",
   "license": "MIT",
   "readme": "README.md",
   "repository": {
     "type": "git",
     "url": "https://github.com/marcosbc/proyecto-gestion.git"
   },
-  "main": "agent.js",
+  "main": "manager.js",
   "dependencies": {
     "deasync": "^0.1.6",
     "net-snmp": "^1.1.17"
@@ -16,7 +16,7 @@
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node agent.js"
+    "start": "node manager.js"
   },
   "author": "Omar Feljy, Beatriz Carretero Parra, Marcos Bjorkelund",
   "license": "MIT"
